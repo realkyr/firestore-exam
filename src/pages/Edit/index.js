@@ -11,17 +11,7 @@ const Edit = () => {
 
   const getData = async () => {
     //  TODO: get data from firestore
-    const db = getFirestoreInstance()
-    const querySnapshot = await getDocs(collection(db, 'questions'))
     const questions = []
-
-    querySnapshot.forEach(doc => {
-      // doc.data() is never undefined for query doc snapshots
-      questions.push({
-        id: doc.id,
-        ...doc.data(),
-      })
-    })
 
     setQuestions(questions)
   }
@@ -40,9 +30,8 @@ const Edit = () => {
       delete question.id
 
       // TODO: implement update
-      if (id) return setDoc(doc(db, 'questions', id), question, { merge: true })
-      else return setDoc(doc(collection(db, 'questions')), question, { merge: true })
-      // or return addDoc(collection(db, 'questions')), question)
+
+      return 1
     })
 
     setQuestions(null)
@@ -90,9 +79,6 @@ const Edit = () => {
     // TODO: impletement delete data
     const db = getFirestoreInstance()
 
-    const collection = 'questions'
-
-    await deleteDoc(doc(db, collection, id))
     await getData()
   }
 

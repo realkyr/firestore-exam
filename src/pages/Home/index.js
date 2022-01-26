@@ -13,21 +13,7 @@ const Home = () => {
 
   useEffect(() => {
     //  TODO: get initial data from firestore
-    const didMount = async () => {
-      const db = getFirestoreInstance()
-      const querySnapshot = await getDocs(collection(db, 'questions'))
-      const questions = []
-
-      querySnapshot.forEach(doc => {
-        // doc.data() is never undefined for query doc snapshots
-        questions.push({
-          id: doc.id,
-          ...doc.data(),
-        })
-      })
-
-      setQuestions(questions)
-    }
+    const didMount = async () => {}
 
     didMount()
   }, [])
@@ -43,11 +29,6 @@ const Home = () => {
   const submit = async () => {
     // TODO: complete organize data in to correct format
     const db = getFirestoreInstance()
-    const ids = Object.keys(answers)
-
-    const parallelWork = ids.map(id => setDoc(doc(db, 'answers', id), { answer: answers[id] }))
-
-    await Promise.all(parallelWork)
   }
 
   return (
