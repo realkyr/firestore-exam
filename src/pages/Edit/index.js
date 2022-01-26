@@ -40,8 +40,11 @@ const Edit = () => {
       delete question.id
 
       // TODO: implement update
-      if (id) return setDoc(doc(db, 'questions', id), question, { merge: true })
-      else return setDoc(doc(collection(db, 'questions')), question, { merge: true })
+      let docRef
+      if (id) docRef = doc(db, 'questions', id)
+      else docRef = doc(collection(db, 'questions'))
+
+      return setDoc(docRef, question, { merge: true })
       // or return addDoc(collection(db, 'questions')), question)
     })
 
