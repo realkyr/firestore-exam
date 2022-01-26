@@ -1,25 +1,83 @@
-import logo from './logo.svg';
+import React, {useEffect, useState} from 'react'
+import { Typography, Radio, Space, Button, Skeleton } from 'antd'
+import { collection, getDocs, doc, setDoc } from 'firebase/firestore'
+
+import 'antd/dist/antd.css'
+
+import { getFirestoreInstance } from 'core/utils/firestore'
+
 import './App.css';
 
-function App() {
+const { Title } = Typography
+
+
+const App = () => {
+  const [answers, setAnswers] = useState({})
+  const [questions, setQuestions] = useState(null)
+
+  useEffect( () => {
+  //  TODO: get initial data from firestore
+    const didMount = async () => {
+      const db = getFirestoreInstance()
+      const querySnapshot = await getDocs(collection(db, 'questions'))
+      const questions = []
+
+      querySnapshot.forEach((doc) => {
+        // doc.data() is never undefined for query doc snapshots
+        questions.push({
+          id: doc.id,
+          ...doc.data()
+        })
+      })
+
+      setQuestions(questions)
+    }
+
+    didMount()
+  }, [])
+
+  const onChange = (id, choice) => {
+    // TODO: complete change value in state
+    setAnswers({
+      ...answers,         // merge remaining answer
+      [id]: choice        // add new key refering id
+    })
+  }
+
+  const submit = async () => {
+    // TODO: complete organize data in to correct format
+    const db = getFirestoreInstance()
+    const ids = Object.keys(answers)
+
+    const parallelWork = ids.map(id => setDoc(doc(db, 'answers', id), { answer: answers[id] }))
+
+    await Promise.all(parallelWork)
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Title level={1}>แบบทดสอบ จาก Yora</Title>
+
+      {questions === null && <Skeleton active />}
+
+      {
+        questions?.map((q, i) => (
+          <div style={{ marginBottom: 20 }} key={q.question}>
+            <Title level={2}>{q.question}</Title>
+            <Radio.Group onChange={e => onChange(q.id, e.target.value)} value={answers[q.id]}>
+              <Space direction="vertical">
+                {
+                  q.choices.map(c => <Radio key={`${q.question} ${c}`} value={c}>{c}</Radio>)
+                }
+              </Space>
+            </Radio.Group>
+          </div>
+        ))
+      }
+
+      <Button style={{ marginTop: 20 }} onClick={submit}>ส่งคำตอบ</Button>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
